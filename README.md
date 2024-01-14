@@ -19,4 +19,4 @@ database containing the movies data
 
 ## Authors
 
-* **Hiba ElBakouri** - *Data engineer intern *
+* **Hiba ElBakouri** - *Data engineer intern :)*
