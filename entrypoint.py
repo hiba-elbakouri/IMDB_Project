@@ -1,5 +1,4 @@
 if __name__ == '__main__':
-
     from pyspark.sql import SparkSession
     import pandas as pd
 
@@ -22,7 +21,6 @@ if __name__ == '__main__':
     spark = SparkSession \
         .builder \
         .appName("IMDbAnalysis") \
-        .config("spark.some.config.option", "some-value") \
         .getOrCreate()
 
     spark.sparkContext.setLogLevel("ERROR")
@@ -63,7 +61,7 @@ if __name__ == '__main__':
     Base = declarative_base()
 
     database_url = 'sqlite:///output/imdb_database.db'
-    engine = create_engine(database_url, echo=True)  
+    engine = create_engine(database_url, echo=True)
 
 
     class Movie(Base):
@@ -75,6 +73,21 @@ if __name__ == '__main__':
         startYear = Column(Integer)
         runtimeMinutes = Column(Integer)
         genres = Column(String)
+
+
+    class Actor(Base):
+        __tablename__ = 'top_actors'
+        nconst = Column(String, primary_key=True)
+        primaryName = Column(String)
+        FilmCount = Column(Integer)
+
+
+    class Movie(Base):
+        __tablename__ = 'top_movies'
+        genres = Column(String, primary_key=True)
+        primaryTitle = Column(String)
+        AverageRating = Column(Integer)
+        MovieCount = Column(Integer)
 
 
     movies_df = pd.read_parquet("./output/title.basics.parquet")
@@ -93,7 +106,6 @@ if __name__ == '__main__':
             return None
 
 
-    spark = SparkSession.builder.appName("IMDbAnalysis").getOrCreate()
 
     title_basics_file = './output/title.basics.parquet'
     title_basics_df = spark.read.parquet(title_basics_file)
@@ -117,21 +129,17 @@ if __name__ == '__main__':
     merged_df = merged_df.join(name_basics_df, on='nconst')
 
     actor_film_counts = (merged_df
-                         .groupBy('nconst', 'primaryName')  
+                         .groupBy('nconst', 'primaryName')
                          .agg({'tconst': 'count'})
                          .withColumnRenamed('count(tconst)', 'FilmCount'))
 
     sorted_actors = actor_film_counts.sort('FilmCount', ascending=False)
 
-    top_actors = sorted_actors.limit(10)  
+    top_actors = sorted_actors.limit(10)
 
-    import sys
+    top_actors_pd = top_actors.toPandas()
+    top_actors_pd.to_sql('top_actors', con=engine, if_exists='replace', index=False)
 
-    with open('./output/top_actors.txt', 'w') as sys.stdout:
-        top_actors.show(truncate=False)
-
-
-    spark = SparkSession.builder.appName("IMDbAnalysis").getOrCreate()
 
     title_basics_file = './output/title.basics.parquet'
     title_basics_df = spark.read.parquet(title_basics_file)
@@ -157,5 +165,5 @@ if __name__ == '__main__':
     top_movies_by_genre = ranked_movies.filter(col('Rank') <= 5).select('genres', 'primaryTitle', 'AverageRating',
                                                                         'MovieCount')
 
-    with open('./output/top_movies.txt', 'w') as sys.stdout:
-        top_movies_by_genre.show(top_movies_by_genre.count(),truncate=False)
+    top_movies_pd = top_movies_by_genre.toPandas()
+    top_movies_pd.to_sql('top_movies', con=engine, if_exists='replace', index=False)
