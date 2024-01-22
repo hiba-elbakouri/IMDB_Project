@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMDb Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Top Actors</h1>
+    <table>
+        <tr>
+            <th>Actor ID</th>
+            <th>Actor Name</th>
+            <th>Film Count</th>
+        </tr>
+        {% for actor in top_actors %}
+        <tr>
+            <td>{{ actor.nconst }}</td>
+            <td>{{ actor.primaryName }}</td>
+            <td>{{ actor.FilmCount }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h1>Top Movies</h1>
+    <table>
+        <tr>
+            <th>Genre</th>
+            <th>Movie Title</th>
+            <th>Average Rating</th>
+            <th>Movie Count</th>
+        </tr>
+        {% for movie in top_movies %}
+        <tr>
+            <td>{{ movie.genres }}</td>
+            <td>{{ movie.primaryTitle }}</td>
+            <td>{{ movie.AverageRating }}</td>
+            <td>{{ movie.MovieCount }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
