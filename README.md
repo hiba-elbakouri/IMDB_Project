@@ -57,7 +57,6 @@ We can explore an event-driven architecture using technologies like Apache Kafka
 
 We can explore Apache Flink as an alternative to Apache Spark for stream processing. 
 
-We can consider Dask, a parallel computing library, as an alternative to PySpark. Dask integrates seamlessly with Jupyter notebooks and provides a flexible parallel computing framework for data analysis.
 
 
 
